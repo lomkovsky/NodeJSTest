@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WebSocket</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+</head>
+<body>
+  <h1>Chat</h1>
+  <div id="chat"></div>
+  <form id="form">
+    <label for="message">&gt;</label>
+    <main>
+      <ul id="messages"></ul>
+
+      <form id="form">
+        <label for="message">&gt;</label>
+        <input type="text" id="input" required autofocus autocomplete="off">
+      </form>
+    </main>
+  </form>
+  <script>
+    const socket = new WebSocket('ws://127.0.0.1:3001/chat');
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('form');
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      socket.send(input.value);
+      input.value = '';
+    });
+    const writeLine = text => {
+      const line = document.createElement('div');
+      line.innerHTML = `<p>${text}</p>`;
+      chat.appendChild(line);
+    };
+    socket.onopen = () => {
+      writeLine('ONLINE');
+    };
+    socket.onclose = () => {
+      writeLine('DISCONNECT');
+    };
+    socket.onmessage = event => {
+      const bytes = CryptoJS.AES.decrypt(event.data.toString(), 'TEST');
+      const plaintext = bytes.toString(CryptoJS.enc.Utf8);
+      writeLine(plaintext);
+    };
+  </script>
+</body>
+
+</html>
